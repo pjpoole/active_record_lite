@@ -1,3 +1,3 @@
-After the project, you can review the solution here:
+Instructions for the project may be found here:
 
-* https://github.com/appacademy-solutions/active_record_lite/tree/solution
+* https://github.com/appacademy/sql-curriculum/blob/master/projects/w3d5-build-your-own-ar.md
