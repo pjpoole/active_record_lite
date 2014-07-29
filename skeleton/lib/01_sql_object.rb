@@ -31,7 +31,7 @@ class SQLObject
     # ...
   end
 
-  def initialize
+  def initialize(params = {})
     # ...
   end
 
