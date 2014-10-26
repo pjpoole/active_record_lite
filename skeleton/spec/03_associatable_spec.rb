@@ -116,6 +116,11 @@ describe 'Associatable' do
       expect(house).to be_instance_of(House)
       expect(house.address).to eq('26th and Guerrero')
     end
+
+    it 'returns nil if no associated object' do
+      stray_cat = Cat.find(5)
+      expect(stray_cat.human).to eq(nil)
+    end
   end
 
   describe '#has_many' do
@@ -144,6 +149,11 @@ describe 'Associatable' do
       expect(humans.length).to eq(1)
       expect(humans[0]).to be_instance_of(Human)
       expect(humans[0].fname).to eq('Ned')
+    end
+
+    it 'returns an empty array if no associated items' do
+      catless_human = Human.find(4)
+      expect(catless_human.cats).to eq([])
     end
   end
 end

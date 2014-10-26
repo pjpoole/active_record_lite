@@ -37,4 +37,8 @@ describe 'Searchable' do
     expect(human.fname).to eq('Matt')
     expect(human.house_id).to eq(1)
   end
+
+  it '#where returns [] if nothing matches the criteria' do
+    expect(Human.where(fname: 'Nowhere', lname: 'Man')).to eq([])
+  end
 end

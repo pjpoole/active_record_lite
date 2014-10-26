@@ -93,7 +93,7 @@ describe SQLObject do
     it '::all returns all the cats' do
       cats = Cat.all
 
-      expect(cats.count).to eq(4)
+      expect(cats.count).to eq(5)
       cats.all? { |cat| expect(cat).to be_instance_of(Cat) }
     end
 
@@ -102,6 +102,10 @@ describe SQLObject do
 
       expect(c).not_to be_nil
       expect(c.name).to eq('Breakfast')
+    end
+
+    it '::find returns nil if no object has the given id' do
+      expect(Cat.find(123)).to be_nil
     end
   end
 
@@ -117,7 +121,7 @@ describe SQLObject do
     end
 
     it '#insert inserts a new record' do
-      expect(Cat.all.count).to eq(5)
+      expect(Cat.all.count).to eq(6)
     end
 
     it '#insert sets the id' do
