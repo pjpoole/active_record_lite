@@ -38,12 +38,26 @@ end
 
 module Associatable
   # Phase IIIb
+
+  # ??? why does options make it into define_method???
   def belongs_to(name, options = {})
-    # ...
+    options = BelongsToOptions.new(name, options)
+
+    define_method(name) do
+      foreign_key = self.send(options.foreign_key)
+
+      options.model_class.where(options.primary_key => foreign_key).first
+    end
   end
 
   def has_many(name, options = {})
-    # ...
+    options = HasManyOptions.new(name, eval(self.name), options)
+
+    define_method(name) do
+      foreign_key = self.send(options.primary_key)
+
+      options.model_class.where(options.foreign_key => foreign_key)
+    end
   end
 
   def assoc_options
@@ -52,5 +66,5 @@ module Associatable
 end
 
 class SQLObject
-  # Mixin Associatable here...
+  extend Associatable
 end
