@@ -105,9 +105,6 @@ class SQLObject
       "#{attr_name} = ?"
     end.join(", ")
 
-    puts set_line
-    puts self.id
-
     DBConnection.execute(<<-SQL, *(attribute_values.drop(1)), self.id)
       UPDATE
         #{self.class.table_name}
