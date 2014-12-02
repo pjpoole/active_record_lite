@@ -10,14 +10,14 @@ module Searchable
       SELECT
         *
       FROM
-        #{eval(self.name).table_name}
+        #{ table_name }
       WHERE
-        #{where_line}
+        #{ where_line }
     SQL
 
     return [] if results.nil?
 
-    eval(self.name).parse_all(results)
+    parse_all(results)
   end
 end
 

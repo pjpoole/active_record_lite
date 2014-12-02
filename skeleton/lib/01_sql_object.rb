@@ -31,7 +31,7 @@ class SQLObject
   end
 
   def self.table_name
-    @table_name ||= self.name.to_s.tableize
+    @table_name ||= self.name.to_s.tableize # to_s redundant? = redundant?
   end
 
   def self.all
@@ -42,31 +42,28 @@ class SQLObject
         #{@table_name}
     SQL
 
-    eval(self.name).parse_all(results)
+    eval(self.name).parse_all(results) # eval(self.name) redundant. Why?
   end
 
   def self.parse_all(results)
-    rows = []
-    results.each do |result|
-      rows << eval(self.name).new(result)
+    results.map do |result|
+      self.new(result)
     end
-
-    rows
   end
 
   def self.find(id)
-    result = DBConnection.execute(<<-SQL, id).first
+    results = DBConnection.execute(<<-SQL, id)
       SELECT
-        #{@table_name}.*
+        #{ table_name }.*
       FROM
-        #{@table_name}
+        #{ table_name }
       WHERE
-        id = ?
+        #{ table_name }.id = ?
     SQL
 
-    return nil if result.nil?
+    return nil if results.nil? # not necessary?
 
-    eval(self.name).new(result)
+    parse_all(results).first
   end
 
   def initialize(params = {})
@@ -82,30 +79,29 @@ class SQLObject
   end
 
   def attribute_values
-    self.class.columns.map { |name| self.send(name) }
+    self.class.columns.map { |attr| self.send(attr) }
   end
 
   def insert
-    col_names = self.class.columns.drop(1).join(",")
-    question_marks = (["?"] * @attributes.length).join(",")
-    values = attribute_values.drop(1)
+    col_names = self.class.columns.map(&:to_s).join(",")
+    question_marks = (["?"] * self.class.columns.count).join(",")
 
-    DBConnection.execute(<<-SQL, *values)
+    DBConnection.execute(<<-SQL, *attribute_values)
       INSERT INTO
-        #{self.class.table_name} (#{col_names})
+        #{ self.class.table_name } (#{ col_names })
       VALUES
-        (#{question_marks})
+        (#{ question_marks })
     SQL
 
     self.id = DBConnection.last_insert_row_id
   end
 
   def update
-    set_line = self.class.columns.drop(1).map do |attr_name|
+    set_line = self.class.columns.map do |attr_name|
       "#{attr_name} = ?"
     end.join(", ")
 
-    DBConnection.execute(<<-SQL, *(attribute_values.drop(1)), self.id)
+    DBConnection.execute(<<-SQL, *attribute_values, id)
       UPDATE
         #{self.class.table_name}
       SET
@@ -116,6 +112,6 @@ class SQLObject
   end
 
   def save
-    self.id.nil? ? insert : update
+    id.nil? ? insert : update
   end
 end
