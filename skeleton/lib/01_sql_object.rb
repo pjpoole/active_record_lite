@@ -15,7 +15,15 @@ class SQLObject
   end
 
   def self.finalize!
-    
+    columns.each do |column|
+      define_method(column) do
+        self.attributes[column]
+      end
+
+      define_method("#{column}=") do |value|
+        self.attributes[column] = value
+      end
+    end
   end
 
   def self.table_name=(table_name)
@@ -39,11 +47,15 @@ class SQLObject
   end
 
   def initialize(params = {})
-    # ...
+    params.each do |attr_name, value|
+      attr_name = attr_name.to_sym
+      raise "unknown attribute '#{attr_name}'" unless self.class.columns.include?(attr_name)
+      self.send("#{attr_name}=", value)
+    end
   end
 
   def attributes
-    # ...
+    @attributes ||= {}
   end
 
   def attribute_values
